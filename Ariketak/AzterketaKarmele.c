@@ -13,6 +13,11 @@ void main()
 {
     int aukera = 0;
     float hasierakoDirua = 10000;
+    float diruaGehitu = 0;
+    float diruaMurriztu = 0;
+    float erabiltzaileakAteratakoa = 0;
+    float erabiltzaileakSartutakoa = 0;
+    
     int fd[2], fd1[2], fd2[2];
     pid_t pid, pid2;
     pipe(fd);
@@ -30,15 +35,16 @@ void main()
         {
             while (1)
             {
-                float erabiltzaileakAteratakoa;
                 //SEMEAK JASO
                 close(fd[1]);//sarrera itxi
+                close(fd2[1]);//sarrera itxi
+                close(fd2[0]);//sarrera itxi
+
                 read(fd[0], erabiltzaileakAteratakoa, sizeof (erabiltzaileakAteratakoa)); //pipea irakurri
                 ateratotal = ateratotal + erabiltzaileakAteratakoa;
-                printf("ateratotal: %f", ateratotal);
                 //SEMEAK BIDALI
                 close (fd1[0]);//pipea irakurtzeko aukera itxi
-                write(fd1[1], ateratotal);//pipean idatzi
+                write(fd1[1], ateratotal, sizeof(ateratotal));//pipean idatzi
             }
         }
         else // Aita
@@ -54,15 +60,16 @@ void main()
                 {
                     while (1)
                     {
-                        float erabiltzaileakSartutakoa;
                         //SEMEAK JASO
                         close(fd[1]);//sarrera itxi
+                        close(fd1[1]);//sarrera itxi
+                        close(fd1[0]);//sarrera itxi
+
                         read(fd[0], erabiltzaileakSartutakoa, sizeof (erabiltzaileakSartutakoa)); //pipea irakurri
                         sartutotal = sartutotal + erabiltzaileakSartutakoa;
-                        printf("sartutotal: %f", sartutotal);
                         //SEMEAK BIDALI
                         close (fd2[0]);//pipea irakurtzeko aukera itxi
-                        write(fd2[1], sartutotal);//pipean idatzi
+                        write(fd2[1], sartutotal, sizeof(sartutotal));//pipean idatzi
                     }
                 }
                 else // Aita
@@ -75,7 +82,6 @@ void main()
                         switch (aukera)
                         {
                         case 1:
-                            float diruaMurriztu;
                             printf("Dirua Ateratzeko prozesuan sartu zara. Zenbat diru nahi duzu atera?\n");
                             scanf("%f", &diruaMurriztu);
                             if (hasierakoDirua > diruaMurriztu)
@@ -87,22 +93,37 @@ void main()
                             {
                                 printf("Kontu Korrontean ez dago hainbeste dirurik...\n");
                             }
+                            close(fd2[1]);//sarrera itxi
+                            close(fd2[0]);//sarrera itxi
+                            close(fd1[1]);//sarrera itxi
+                            close(fd1[0]);//sarrera itxi
+
                             close(fd[0]);
-                            write(fd[1], diruaMurriztu); // pipean idazten...
-                            pid = wait(NULL);
+                            write(fd[1], diruaMurriztu, sizeof(diruaMurriztu)); // pipean idazten...
+                            //wait(NULL);
                             break;
 
                         case 2:
-                            float diruaGehitu;
                             printf("Dirua Sartzeko prozesuan sartu zara. Zenbat diru nahi duzu sartu?\n");
                             scanf("%f", &diruaGehitu);
                             hasierakoDirua = hasierakoDirua + diruaGehitu;
                             printf("Kontu Korronteko Saldoa: %f\n", hasierakoDirua);
+                            close(fd2[1]);//sarrera itxi
+                            close(fd2[0]);//sarrera itxi
+                            close(fd1[1]);//sarrera itxi
+                            close(fd1[0]);//sarrera itxi
                             close(fd[0]);
-                            write(fd[1], diruaGehitu); // pipean idazten...
-                            wait(NULL);
+                            write(fd[1], diruaGehitu, sizeof(diruaGehitu)); // pipean idazten...
+                            //wait(NULL);
                             break;
                         case 3:
+                            read(fd2[0], sartutotal, sizeof(sartutotal));//pipea irakurri       
+                            read(fd1[0], ateratotal, sizeof(ateratotal));//pipea irakurri
+                            read(fd[0], hasierakoDirua, sizeof(hasierakoDirua));//pipea irakurri
+                            
+                            close(fd2[1]);//sarrera itxi
+                            close(fd1[1]);//sarrera itxi
+                            close(fd[1]); ///sarrera itxi
 
                             printf("Gaur egungo Kontu Korronteko saldoa honako hau da : %f\n", hasierakoDirua);
                             printf("%f ateraldi egin dira guztira\n", ateratotal);
