@@ -1,4 +1,4 @@
-package zerbitzuak_socket;
+package zerbitzuak_socket_TCP;
 
 import java.io.*;
 import java.net.*;

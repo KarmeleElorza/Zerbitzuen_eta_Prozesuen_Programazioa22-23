@@ -1,5 +1,5 @@
 
-package zerbitzuak_socket;
+package zerbitzuak_socket_TCP;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -15,25 +15,25 @@ import java.net.Socket;
  */
 public class Servidor_if2options {
     public static void main(String[] arg) throws IOException {
-        int numeroPuerto = 6000;// Puerto
-        ServerSocket servidor = new ServerSocket(numeroPuerto);
-        Socket clienteConectado = null;
-
-        System.out.println("Esperando al cliente ");
-        clienteConectado = servidor.accept();
+        int puerto = 6000;// Puerto
+        ServerSocket servidor = new ServerSocket(puerto);
+        System.out.println("Escuchando en " + servidor.getLocalPort());
+        System.out.println("Esperando al cliente .......");
+        Socket clienteConectado = servidor.accept();
+        
 // CREO FLUJO DE ENTRADA DEL CLIENTE
         InputStream entrada = null;
         entrada = clienteConectado.getInputStream();
         DataInputStream flujoEntrada = new DataInputStream(entrada);
 //EL CLIENTE ME ENVIA UN MENSAJE
-
-        System.out.println("Recibiendo del CLIENTE: \n\t" + flujoEntrada.readUTF());
+        String entradaServidor = flujoEntrada.readUTF().toString();
+        System.out.println("Recibiendo del CLIENTE: \n\t" + entradaServidor);
 // CREO FLUJO DE SALIDA AL CLIENTE
         OutputStream salida = null;
         salida = clienteConectado.getOutputStream();
         DataOutputStream flujoSalida = new DataOutputStream(salida);
 // ENVIO UN SALUDO AL CLIENTE
-        if(flujoEntrada.readUTF().equals("1")){
+        if(entradaServidor.equals("1")){
             flujoSalida.writeUTF("Saludos al cliente del servidor");
         }
         else
